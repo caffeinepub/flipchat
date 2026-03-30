@@ -94,6 +94,10 @@ export interface UserProfile {
     email: string;
     profilePicture?: ExternalBlob;
 }
+export interface OtpResult {
+    ok: boolean;
+    message: string;
+}
 export interface _CaffeineStorageCreateCertificateResult {
     method: string;
     blob_hash: string;
@@ -124,6 +128,8 @@ export interface backendInterface {
     getUserProfile(user: Principal): Promise<UserProfile | null>;
     isCallerAdmin(): Promise<boolean>;
     saveCallerUserProfile(profile: UserProfile): Promise<void>;
+    sendOtp(phone: string): Promise<OtpResult>;
+    verifyOtp(phone: string, code: string): Promise<OtpResult>;
 }
 import type { ExternalBlob as _ExternalBlob, UserProfile as _UserProfile, UserRole as _UserRole, _CaffeineStorageRefillInformation as __CaffeineStorageRefillInformation, _CaffeineStorageRefillResult as __CaffeineStorageRefillResult } from "./declarations/backend.did.d.ts";
 export class Backend implements backendInterface {
@@ -308,6 +314,34 @@ export class Backend implements backendInterface {
         } else {
             const result = await this.actor.saveCallerUserProfile(await to_candid_UserProfile_n17(this._uploadFile, this._downloadFile, arg0));
             return result;
+        }
+    }
+    async sendOtp(arg0: string): Promise<OtpResult> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.sendOtp(arg0);
+                return result as unknown as OtpResult;
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.sendOtp(arg0);
+            return result as unknown as OtpResult;
+        }
+    }
+    async verifyOtp(arg0: string, arg1: string): Promise<OtpResult> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.verifyOtp(arg0, arg1);
+                return result as unknown as OtpResult;
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.verifyOtp(arg0, arg1);
+            return result as unknown as OtpResult;
         }
     }
 }

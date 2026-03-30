@@ -18,6 +18,9 @@ import {
   saveCallRecord,
 } from "./utils/chatStorage";
 
+const LOGO_SRC =
+  "/assets/uploads/file_0000000002bc71fa916666f6929ea802-019d3ae7-437e-7238-9d98-d280ebef58c4-1.png";
+
 type Screen =
   | "loading"
   | "login"
@@ -58,6 +61,7 @@ export default function App() {
   const [activeContact, setActiveContact] = useState<Contact | null>(null);
   const [activeGroup, setActiveGroup] = useState<Group | null>(null);
   const [localProfile, setLocalProfile] = useState<LocalProfile | null>(null);
+  const [logoError, setLogoError] = useState(false);
 
   // Call state
   const [callState, setCallState] = useState<CallState>("none");
@@ -78,7 +82,6 @@ export default function App() {
         setLocalProfile(lp);
         setScreen("chatlist");
       } else {
-        // Clear any stale data
         localStorage.removeItem(SESSION_KEY);
         setScreen("login");
       }
@@ -108,7 +111,6 @@ export default function App() {
   }, [screen]);
 
   function handleNameLogin(nameInput: string) {
-    // Extract name (handle both "name:xyz" and plain name)
     const userName = nameInput.startsWith("name:")
       ? nameInput.slice(5).trim()
       : nameInput.trim();
@@ -282,11 +284,16 @@ export default function App() {
               transition={{ duration: 0.3 }}
             >
               <div className="w-20 h-20 rounded-3xl bg-primary/20 flex items-center justify-center overflow-hidden">
-                <img
-                  src="/assets/generated/flipchat-logo-transparent.png"
-                  alt="Flipchat"
-                  className="w-full h-full object-cover rounded-3xl"
-                />
+                {logoError ? (
+                  <span className="text-4xl font-black text-primary">F</span>
+                ) : (
+                  <img
+                    src={LOGO_SRC}
+                    alt="Flipchat"
+                    className="w-full h-full object-cover rounded-3xl"
+                    onError={() => setLogoError(true)}
+                  />
+                )}
               </div>
               <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin" />
             </motion.div>

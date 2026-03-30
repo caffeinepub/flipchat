@@ -19,6 +19,10 @@ export interface UserProfile {
     email: string;
     profilePicture?: ExternalBlob;
 }
+export interface OtpResult {
+    ok: boolean;
+    message: string;
+}
 export enum UserRole {
     admin = "admin",
     user = "user",
@@ -31,4 +35,6 @@ export interface backendInterface {
     getUserProfile(user: Principal): Promise<UserProfile | null>;
     isCallerAdmin(): Promise<boolean>;
     saveCallerUserProfile(profile: UserProfile): Promise<void>;
+    sendOtp(phone: string): Promise<OtpResult>;
+    verifyOtp(phone: string, code: string): Promise<OtpResult>;
 }
