@@ -28,7 +28,7 @@ actor {
   let userProfiles = Map.empty<Principal, UserProfile>();
   let otpStore = Map.empty<Text, (Text, Int)>();
 
-  var FAST2SMS_KEY : Text = "ofapi_F2caJhINlMa5GVRZWPxs6auG2mwU7KQ5M1lflrqlb2d4cbdc";
+  var FAST2SMS_KEY : Text = "5By2fQkvYIjqKcWVPRt5xaTrppVAOYOxCnfxWNQXXeChPrC0a0tUan6Nj9QG";
   let OTP_EXPIRY_NANOS : Int = 5 * 60 * 1_000_000_000;
 
   public shared func setSmsApiKey(key : Text) : async () {
