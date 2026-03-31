@@ -8,6 +8,7 @@ import {
   Camera,
   CircleDot,
   Edit,
+  ImagePlus,
   MessageCircle,
   MoreVertical,
   Pencil,
@@ -18,9 +19,11 @@ import {
   User,
   Users,
   Video,
+  X,
 } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import { toast } from "sonner";
 import type {
   CallRecord,
   Contact,
@@ -65,6 +68,7 @@ interface StatusEntry {
   id: string;
   text: string;
   timestamp: number;
+  imageUrl?: string;
 }
 
 interface ContactStatus {
@@ -133,10 +137,14 @@ function StatusTab() {
   );
   const [showAddModal, setShowAddModal] = useState(false);
   const [newStatusText, setNewStatusText] = useState("");
+  const [newStatusImage, setNewStatusImage] = useState<string | null>(null);
   const [viewingStatus, setViewingStatus] = useState<ContactStatus | null>(
     null,
   );
   const [viewIdx, setViewIdx] = useState(0);
+
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const cameraFileInputRef = useRef<HTMLInputElement>(null);
 
   const profileRaw = localStorage.getItem("flipchat_my_profile");
   const myProfile: { name: string; avatar?: string } = profileRaw
@@ -154,12 +162,25 @@ function StatusTab() {
     })),
   }));
 
+  function handleImageSelect(file: File) {
+    if (file.size > 500 * 1024) {
+      toast.error("Chhoti photo use karo (max 500KB)");
+      return;
+    }
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      setNewStatusImage(e.target?.result as string);
+    };
+    reader.readAsDataURL(file);
+  }
+
   function postStatus() {
-    if (!newStatusText.trim()) return;
+    if (!newStatusText.trim() && !newStatusImage) return;
     const entry: StatusEntry = {
       id: `status-${Date.now()}`,
       text: newStatusText.trim(),
       timestamp: Date.now(),
+      imageUrl: newStatusImage ?? undefined,
     };
     const updated = [entry, ...myStatuses].filter(
       (s) => Date.now() - s.timestamp < HOURS_24,
@@ -167,12 +188,18 @@ function StatusTab() {
     setMyStatuses(updated);
     saveMyStatuses(updated);
     setNewStatusText("");
+    setNewStatusImage(null);
     setShowAddModal(false);
   }
 
   function openStatusView(cs: ContactStatus) {
     setViewingStatus(cs);
     setViewIdx(0);
+  }
+
+  // Get thumbnail for a status group (first image if available)
+  function getStatusThumbnail(statuses: StatusEntry[]): string | undefined {
+    return statuses.find((s) => s.imageUrl)?.imageUrl;
   }
 
   const myContactStatus: ContactStatus = {
@@ -183,8 +210,38 @@ function StatusTab() {
     statuses: myStatuses,
   };
 
+  const canPost = !!(newStatusText.trim() || newStatusImage);
+
   return (
     <div className="flex flex-col h-full">
+      {/* Hidden file inputs */}
+      <input
+        ref={fileInputRef}
+        type="file"
+        accept="image/*"
+        className="hidden"
+        onChange={(e) => {
+          const file = e.target.files?.[0];
+          if (file) handleImageSelect(file);
+          e.target.value = "";
+        }}
+      />
+      <input
+        ref={cameraFileInputRef}
+        type="file"
+        accept="image/*"
+        capture="environment"
+        className="hidden"
+        onChange={(e) => {
+          const file = e.target.files?.[0];
+          if (file) {
+            handleImageSelect(file);
+            setShowAddModal(true);
+          }
+          e.target.value = "";
+        }}
+      />
+
       {/* My Status Row */}
       <div className="px-4 py-3 border-b border-border">
         <div className="flex items-center gap-3">
@@ -206,7 +263,14 @@ function StatusTab() {
                   : "ring-2 ring-border ring-offset-2 ring-offset-background"
               }`}
             >
-              {myProfile.avatar ? (
+              {/* Show first image status as thumbnail if available */}
+              {getStatusThumbnail(myStatuses) ? (
+                <img
+                  src={getStatusThumbnail(myStatuses)}
+                  alt="My status"
+                  className="w-full h-full object-cover"
+                />
+              ) : myProfile.avatar ? (
                 <img
                   src={myProfile.avatar}
                   alt={myProfile.name}
@@ -245,6 +309,8 @@ function StatusTab() {
             </button>
             <button
               type="button"
+              data-ocid="status.upload_button"
+              onClick={() => cameraFileInputRef.current?.click()}
               className="w-9 h-9 rounded-full bg-muted flex items-center justify-center hover:bg-muted/70 transition-colors"
             >
               <Camera className="w-4 h-4 text-foreground" />
@@ -262,41 +328,52 @@ function StatusTab() {
 
       {/* Contacts' statuses */}
       <div className="flex-1 overflow-y-auto">
-        {demoStatuses.map((cs, idx) => (
-          <motion.button
-            key={cs.contactId}
-            type="button"
-            data-ocid={`status.item.${idx + 1}`}
-            initial={{ opacity: 0, x: -10 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ delay: idx * 0.06 }}
-            onClick={() => openStatusView(cs)}
-            className="w-full flex items-center gap-3 px-4 py-3 hover:bg-card/80 transition-colors border-b border-border/30 active:bg-accent"
-          >
-            <div className="relative flex-shrink-0">
-              <div
-                className={`w-14 h-14 rounded-full flex items-center justify-center text-white font-bold text-lg ring-2 ring-primary ring-offset-2 ring-offset-background ${cs.colorClass}`}
-              >
-                {cs.avatar ? (
-                  <img
-                    src={cs.avatar}
-                    alt={cs.name}
-                    className="w-full h-full object-cover rounded-full"
-                  />
-                ) : (
-                  getInitials(cs.name)
-                )}
+        {demoStatuses.map((cs, idx) => {
+          const thumbnail = getStatusThumbnail(cs.statuses);
+          return (
+            <motion.button
+              key={cs.contactId}
+              type="button"
+              data-ocid={`status.item.${idx + 1}`}
+              initial={{ opacity: 0, x: -10 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: idx * 0.06 }}
+              onClick={() => openStatusView(cs)}
+              className="w-full flex items-center gap-3 px-4 py-3 hover:bg-card/80 transition-colors border-b border-border/30 active:bg-accent"
+            >
+              <div className="relative flex-shrink-0">
+                <div
+                  className={`w-14 h-14 rounded-full flex items-center justify-center text-white font-bold text-lg ring-2 ring-primary ring-offset-2 ring-offset-background overflow-hidden ${cs.colorClass}`}
+                >
+                  {thumbnail ? (
+                    <img
+                      src={thumbnail}
+                      alt={cs.name}
+                      className="w-full h-full object-cover"
+                    />
+                  ) : cs.avatar ? (
+                    <img
+                      src={cs.avatar}
+                      alt={cs.name}
+                      className="w-full h-full object-cover rounded-full"
+                    />
+                  ) : (
+                    getInitials(cs.name)
+                  )}
+                </div>
               </div>
-            </div>
-            <div className="flex-1 min-w-0 text-left">
-              <p className="font-semibold text-sm text-foreground">{cs.name}</p>
-              <p className="text-xs text-muted-foreground">
-                {cs.statuses.length} update ·{" "}
-                {timeAgo(cs.statuses[0].timestamp)}
-              </p>
-            </div>
-          </motion.button>
-        ))}
+              <div className="flex-1 min-w-0 text-left">
+                <p className="font-semibold text-sm text-foreground">
+                  {cs.name}
+                </p>
+                <p className="text-xs text-muted-foreground">
+                  {cs.statuses.length} update ·{" "}
+                  {timeAgo(cs.statuses[0].timestamp)}
+                </p>
+              </div>
+            </motion.button>
+          );
+        })}
       </div>
 
       {/* ── Add Status Modal ── */}
@@ -312,13 +389,16 @@ function StatusTab() {
             {/* Backdrop */}
             <div
               className="absolute inset-0 bg-black/60"
-              onClick={() => setShowAddModal(false)}
+              onClick={() => {
+                setShowAddModal(false);
+                setNewStatusImage(null);
+              }}
               onKeyDown={(e) => e.key === "Enter" && setShowAddModal(false)}
               role="button"
               tabIndex={0}
             />
             <motion.div
-              className="relative bg-card rounded-t-3xl px-5 pt-5 pb-8 z-10"
+              className="relative bg-card rounded-t-3xl px-5 pt-5 pb-8 z-10 max-h-[85vh] overflow-y-auto"
               initial={{ y: 200 }}
               animate={{ y: 0 }}
               exit={{ y: 200 }}
@@ -331,6 +411,36 @@ function StatusTab() {
               <p className="text-xs text-muted-foreground mb-4">
                 Aapka status 24 ghante mein gayab ho jaayega
               </p>
+
+              {/* ── Photo Upload Area ── */}
+              {newStatusImage ? (
+                <div className="relative w-full mb-4 rounded-2xl overflow-hidden">
+                  <img
+                    src={newStatusImage}
+                    alt="Status preview"
+                    className="w-full max-h-48 object-cover rounded-2xl"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setNewStatusImage(null)}
+                    className="absolute top-2 right-2 w-7 h-7 rounded-full bg-black/60 flex items-center justify-center text-white hover:bg-black/80 transition-colors"
+                  >
+                    <X className="w-4 h-4" />
+                  </button>
+                </div>
+              ) : (
+                <button
+                  type="button"
+                  data-ocid="status.dropzone"
+                  onClick={() => fileInputRef.current?.click()}
+                  className="w-full mb-4 h-28 rounded-2xl border-2 border-dashed border-border/60 flex flex-col items-center justify-center gap-2 hover:border-primary/50 hover:bg-primary/5 transition-colors"
+                >
+                  <ImagePlus className="w-7 h-7 text-muted-foreground" />
+                  <span className="text-xs text-muted-foreground">
+                    Photo add karo (optional)
+                  </span>
+                </button>
+              )}
 
               {/* Emoji quick picks */}
               <div className="flex gap-2 mb-3 flex-wrap">
@@ -361,8 +471,12 @@ function StatusTab() {
 
               <textarea
                 data-ocid="status.textarea"
-                className="w-full h-24 rounded-2xl bg-muted border border-border text-foreground placeholder:text-muted-foreground text-sm p-3 resize-none focus:outline-none focus:ring-2 focus:ring-primary/40"
-                placeholder="Kya chal raha hai? 🤔"
+                className="w-full h-20 rounded-2xl bg-muted border border-border text-foreground placeholder:text-muted-foreground text-sm p-3 resize-none focus:outline-none focus:ring-2 focus:ring-primary/40"
+                placeholder={
+                  newStatusImage
+                    ? "Caption likhna ho toh..."
+                    : "Kya chal raha hai? 🤔"
+                }
                 value={newStatusText}
                 onChange={(e) => setNewStatusText(e.target.value)}
                 maxLength={200}
@@ -374,13 +488,11 @@ function StatusTab() {
               <Button
                 data-ocid="status.submit_button"
                 onClick={postStatus}
-                disabled={!newStatusText.trim()}
+                disabled={!canPost}
                 className="w-full h-12 rounded-2xl text-base font-semibold"
                 style={{
-                  background: newStatusText.trim()
-                    ? "oklch(var(--primary))"
-                    : undefined,
-                  opacity: newStatusText.trim() ? 1 : 0.45,
+                  background: canPost ? "oklch(var(--primary))" : undefined,
+                  opacity: canPost ? 1 : 0.45,
                 }}
               >
                 Status Lagao ✓
@@ -401,8 +513,25 @@ function StatusTab() {
             exit={{ opacity: 0, scale: 0.97 }}
             transition={{ duration: 0.2 }}
           >
+            {/* Background image if present */}
+            {viewingStatus.statuses[viewIdx]?.imageUrl && (
+              <img
+                src={viewingStatus.statuses[viewIdx].imageUrl}
+                alt="Status"
+                className="absolute inset-0 w-full h-full object-cover"
+              />
+            )}
+
+            {/* Dark overlay for text statuses without image */}
+            {!viewingStatus.statuses[viewIdx]?.imageUrl && (
+              <div className="absolute inset-0 bg-[#1a1a2e]" />
+            )}
+
+            {/* Gradient at top for readability */}
+            <div className="absolute inset-x-0 top-0 h-32 bg-gradient-to-b from-black/70 to-transparent z-10" />
+
             {/* Progress bars */}
-            <div className="flex gap-1 px-3 pt-10 pb-2">
+            <div className="relative z-20 flex gap-1 px-3 pt-10 pb-2">
               {viewingStatus.statuses.map((s, i) => (
                 <div
                   key={s.id}
@@ -422,7 +551,7 @@ function StatusTab() {
             </div>
 
             {/* Header */}
-            <div className="flex items-center gap-3 px-4 pb-3">
+            <div className="relative z-20 flex items-center gap-3 px-4 pb-3">
               <div
                 className={`w-10 h-10 rounded-full flex items-center justify-center text-white font-bold text-sm overflow-hidden ${viewingStatus.colorClass}`}
               >
@@ -454,10 +583,10 @@ function StatusTab() {
               </button>
             </div>
 
-            {/* Status content */}
+            {/* Status content - tap to advance */}
             <button
               type="button"
-              className="flex-1 flex items-center justify-center px-8 cursor-pointer w-full"
+              className="flex-1 flex items-center justify-center px-8 cursor-pointer w-full relative z-10"
               onClick={() => {
                 if (viewIdx < viewingStatus.statuses.length - 1) {
                   setViewIdx((v) => v + 1);
@@ -466,10 +595,24 @@ function StatusTab() {
                 }
               }}
             >
-              <p className="text-white text-2xl font-semibold text-center leading-relaxed">
-                {viewingStatus.statuses[viewIdx]?.text}
-              </p>
+              {!viewingStatus.statuses[viewIdx]?.imageUrl && (
+                <p className="text-white text-2xl font-semibold text-center leading-relaxed drop-shadow-lg">
+                  {viewingStatus.statuses[viewIdx]?.text}
+                </p>
+              )}
             </button>
+
+            {/* Caption overlay for image statuses */}
+            {viewingStatus.statuses[viewIdx]?.imageUrl &&
+              viewingStatus.statuses[viewIdx]?.text && (
+                <div className="relative z-20 px-5 pb-10">
+                  <div className="bg-black/50 backdrop-blur-sm rounded-2xl px-4 py-3">
+                    <p className="text-white text-base font-medium text-center">
+                      {viewingStatus.statuses[viewIdx].text}
+                    </p>
+                  </div>
+                </div>
+              )}
           </motion.div>
         )}
       </AnimatePresence>
