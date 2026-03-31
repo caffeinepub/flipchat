@@ -35,6 +35,7 @@ type CallState = "none" | "incoming" | "outgoing" | "active";
 
 interface LocalProfile {
   name: string;
+  phone?: string;
   status: string;
   avatar?: string;
   memberSince: string;
@@ -110,15 +111,26 @@ export default function App() {
     };
   }, [screen]);
 
-  function handleNameLogin(nameInput: string) {
-    const userName = nameInput.startsWith("name:")
-      ? nameInput.slice(5).trim()
-      : nameInput.trim();
+  function handleNameLogin(loginData: string) {
+    // Parse format: "name:Rahul|phone:9876543210"
+    let userName = loginData.trim();
+    let phoneNumber = "";
+
+    if (loginData.includes("|")) {
+      const parts = loginData.split("|");
+      const namePart = parts.find((p) => p.startsWith("name:"));
+      const phonePart = parts.find((p) => p.startsWith("phone:"));
+      userName = namePart ? namePart.slice(5).trim() : "";
+      phoneNumber = phonePart ? phonePart.slice(6).trim() : "";
+    } else if (loginData.startsWith("name:")) {
+      userName = loginData.slice(5).trim();
+    }
 
     if (!userName) return;
 
     const lp: LocalProfile = {
       name: userName,
+      phone: phoneNumber || undefined,
       status: "Hey there! I am using Flipchat 👋",
       memberSince: new Date().toLocaleDateString("en-US", {
         month: "long",
@@ -220,6 +232,7 @@ export default function App() {
   function handleProfileSave(name: string, status: string, avatar?: string) {
     const lp: LocalProfile = {
       name,
+      phone: localProfile?.phone,
       status,
       avatar,
       memberSince:
@@ -412,6 +425,7 @@ export default function App() {
             >
               <ProfileScreen
                 name={localProfile?.name || ""}
+                phone={localProfile?.phone}
                 status={localProfile?.status || ""}
                 avatar={localProfile?.avatar}
                 memberSince={

@@ -127,7 +127,7 @@ export function LoginScreen({ onPhoneLogin }: LoginScreenProps) {
         return;
       }
       setError("");
-      onPhoneLogin(`name:${name.trim()}`);
+      onPhoneLogin(`name:${name.trim()}|phone:${cleaned}`);
     } catch {
       setError("Verify karne mein error aaya ❌");
       setOtp(["", "", "", "", "", ""]);

@@ -28,7 +28,8 @@ actor {
   let userProfiles = Map.empty<Principal, UserProfile>();
   let otpStore = Map.empty<Text, (Text, Int)>();
 
-  var FAST2SMS_KEY : Text = "5By2fQkvYIjqKcWVPRt5xaTrppVAOYOxCnfxWNQXXeChPrC0a0tUan6Nj9QG";
+  // Keep variable name for stable compatibility; now holds 2Factor.in API key
+  var FAST2SMS_KEY : Text = "aa417444-2cad-11f1-ae4a-0200cd936042";
   let OTP_EXPIRY_NANOS : Int = 5 * 60 * 1_000_000_000;
 
   public shared func setSmsApiKey(key : Text) : async () {
@@ -48,19 +49,19 @@ actor {
     let code = seed.toText();
     otpStore.add(phone, (code, now));
 
-    // Use GET request - more reliable for Fast2SMS OTP route
-    let url = "https://www.fast2sms.com/dev/bulkV2?authorization=" # FAST2SMS_KEY
-      # "&route=otp&variables_values=" # code
-      # "&numbers=" # phone
-      # "&flash=0";
+    // 2Factor.in API - send specific OTP
+    let url = "https://2factor.in/API/V1/" # FAST2SMS_KEY
+      # "/SMS/" # phone
+      # "/" # code
+      # "/OTP1";
 
     let headers : [Outcall.Header] = [
       { name = "Cache-Control"; value = "no-cache" },
     ];
     try {
       let response = await Outcall.httpGetRequest(url, headers, transform);
-      // Fast2SMS returns {"return":true,...} on success
-      if (response.contains(#text "\"return\":true")) {
+      // 2Factor.in returns {"Status":"Success",...} on success
+      if (response.contains(#text "\"Status\":\"Success\"")) {
         { ok = true; message = "OTP bheja gaya " # phone # " par" };
       } else {
         otpStore.remove(phone);
