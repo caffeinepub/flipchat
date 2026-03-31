@@ -2,6 +2,7 @@ import Map "mo:core/Map";
 import Principal "mo:core/Principal";
 import Time "mo:core/Time";
 import Int "mo:core/Int";
+import Text "mo:core/Text";
 import MixinAuthorization "authorization/MixinAuthorization";
 import AccessControl "authorization/access-control";
 import MixinStorage "blob-storage/Mixin";
@@ -27,7 +28,7 @@ actor {
   let userProfiles = Map.empty<Principal, UserProfile>();
   let otpStore = Map.empty<Text, (Text, Int)>();
 
-  stable var FAST2SMS_KEY : Text = "ofapi_F2caJhINlMa5GVRZWPxs6auG2mwU7KQ5M1lflrqlb2d4cbdc";
+  var FAST2SMS_KEY : Text = "ofapi_F2caJhINlMa5GVRZWPxs6auG2mwU7KQ5M1lflrqlb2d4cbdc";
   let OTP_EXPIRY_NANOS : Int = 5 * 60 * 1_000_000_000;
 
   public shared func setSmsApiKey(key : Text) : async () {
@@ -46,22 +47,28 @@ actor {
     let seed = Int.abs(now) % 900000 + 100000;
     let code = seed.toText();
     otpStore.add(phone, (code, now));
-    // Use Fast2SMS OTP route (works without DLT registration)
-    let jsonBody = "{\"route\":\"otp\",\"variables_values\":\"" # code # "\",\"numbers\":\"" # phone # "\",\"flash\":\"0\"}";
+
+    // Use GET request - more reliable for Fast2SMS OTP route
+    let url = "https://www.fast2sms.com/dev/bulkV2?authorization=" # FAST2SMS_KEY
+      # "&route=otp&variables_values=" # code
+      # "&numbers=" # phone
+      # "&flash=0";
+
     let headers : [Outcall.Header] = [
-      { name = "authorization"; value = FAST2SMS_KEY },
-      { name = "Content-Type"; value = "application/json" },
+      { name = "Cache-Control"; value = "no-cache" },
     ];
     try {
-      let _response = await Outcall.httpPostRequest(
-        "https://www.fast2sms.com/dev/bulkV2",
-        headers,
-        jsonBody,
-        transform,
-      );
-      { ok = true; message = "OTP bheja gaya " # phone # " par" };
+      let response = await Outcall.httpGetRequest(url, headers, transform);
+      // Fast2SMS returns {"return":true,...} on success
+      if (response.contains(#text "\"return\":true")) {
+        { ok = true; message = "OTP bheja gaya " # phone # " par" };
+      } else {
+        otpStore.remove(phone);
+        { ok = false; message = "SMS nahi gaya: " # response };
+      };
     } catch (_e) {
-      { ok = false; message = "SMS bhejne mein error aaya. Dobara try karo." };
+      otpStore.remove(phone);
+      { ok = false; message = "Network error: SMS service se connect nahi ho paya. Dobara try karo." };
     };
   };
 
@@ -72,10 +79,10 @@ actor {
         let now = Time.now();
         let elapsed = now - timestamp;
         if (elapsed > OTP_EXPIRY_NANOS) {
-          ignore otpStore.remove(phone);
+          otpStore.remove(phone);
           { ok = false; message = "OTP ki meyad khatam ho gayi. Dobara OTP bhejo." };
         } else if (code == storedCode) {
-          ignore otpStore.remove(phone);
+          otpStore.remove(phone);
           { ok = true; message = "OTP verified! Login ho gaya." };
         } else {
           { ok = false; message = "Galat OTP hai, dobara try karo" };
@@ -88,7 +95,7 @@ actor {
     userProfiles.get(caller);
   };
 
-  public query ({ caller }) func getUserProfile(user : Principal) : async ?UserProfile {
+  public query func getUserProfile(user : Principal) : async ?UserProfile {
     userProfiles.get(user);
   };
 
