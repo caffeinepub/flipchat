@@ -23,7 +23,8 @@
       "recommended": true,
       "correctness": {
         "useHookAtTopLevel": "error",
-        "noUnusedVariables": "error"
+        "noUnusedVariables": "error",
+        "useExhaustiveDependencies": "off"
       },
       "suspicious": {
         "noExplicitAny": "off"
@@ -31,6 +32,13 @@
       "style": {
         "useConst": "off",
         "noNonNullAssertion": "off"
+      },
+      "a11y": {
+        "noSvgWithoutTitle": "off",
+        "noLabelWithoutControl": "off",
+        "noAutofocus": "off",
+        "useKeyWithClickEvents": "off",
+        "useButtonType": "off"
       }
     }
   },

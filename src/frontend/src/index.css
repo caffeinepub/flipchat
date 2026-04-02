@@ -1,125 +1,146 @@
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap");
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-@font-face {
-  font-family: "Figtree";
-  src: url("/assets/fonts/Figtree.woff2") format("woff2");
-  font-weight: 300 900;
-  font-display: swap;
-}
-
 @layer base {
   :root {
-    --radius: 0.75rem;
+    --background: 0 0% 100%;
+    --foreground: 0 0% 10%;
+    --card: 0 0% 100%;
+    --card-foreground: 0 0% 10%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 0 0% 10%;
+    --primary: 142.1 76.2% 36.3%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 0 0% 96%;
+    --secondary-foreground: 0 0% 10%;
+    --muted: 0 0% 96%;
+    --muted-foreground: 0 0% 45%;
+    --accent: 142.1 76.2% 36.3%;
+    --accent-foreground: 0 0% 100%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 0 0% 89.8%;
+    --input: 0 0% 89.8%;
+    --ring: 142.1 76.2% 36.3%;
+    --radius: 0.5rem;
 
-    /* Flipchat dark theme — always dark */
-    --background: 0.09 0.012 263;
-    --foreground: 0.93 0.012 256;
-    --card: 0.13 0.018 263;
-    --card-foreground: 0.93 0.012 256;
-    --popover: 0.13 0.018 263;
-    --popover-foreground: 0.93 0.012 256;
-    --primary: 0.52 0.247 271;
-    --primary-foreground: 0.98 0 0;
-    --secondary: 0.18 0.02 263;
-    --secondary-foreground: 0.93 0.012 256;
-    --muted: 0.18 0.02 263;
-    --muted-foreground: 0.73 0.018 256;
-    --accent: 0.21 0.022 263;
-    --accent-foreground: 0.93 0.012 256;
-    --destructive: 0.577 0.245 27.325;
-    --destructive-foreground: 0.985 0 0;
-    --border: 0.21 0.022 263;
-    --input: 0.21 0.022 263;
-    --ring: 0.52 0.247 271;
-    --chart-1: 0.52 0.247 271;
-    --chart-2: 0.72 0.19 145;
-    --chart-3: 0.69 0.15 237;
-    --chart-4: 0.627 0.265 303.9;
-    --chart-5: 0.645 0.246 16.439;
-    --sidebar: 0.13 0.018 263;
-    --sidebar-foreground: 0.93 0.012 256;
-    --sidebar-primary: 0.52 0.247 271;
-    --sidebar-primary-foreground: 0.98 0 0;
-    --sidebar-accent: 0.21 0.022 263;
-    --sidebar-accent-foreground: 0.93 0.012 256;
-    --sidebar-border: 0.21 0.022 263;
-    --sidebar-ring: 0.52 0.247 271;
-
-    /* Brand extras */
-    --brand-glow: oklch(0.52 0.247 271 / 0.3);
-    --online-green: 0.72 0.19 145;
-    --tick-blue: 0.69 0.15 237;
-    --sent-bubble: 0.3 0.12 271;
-    --received-bubble: 0.16 0.02 263;
+    /* Flipchat custom */
+    --fc-green: oklch(0.74 0.22 145);
+    --fc-green-dark: oklch(0.54 0.18 165);
+    --fc-green-light: oklch(0.92 0.08 145);
+    --fc-sent-bubble: oklch(0.92 0.08 145);
+    --fc-chat-bg: oklch(0.97 0.01 90);
+    --fc-header-bg: oklch(0.54 0.18 165);
+    --fc-unread: oklch(0.74 0.22 145);
   }
 
   * {
     @apply border-border;
   }
 
-  html,
-  body,
-  #root {
-    height: 100%;
-    overflow: hidden;
-  }
-
   body {
     @apply bg-background text-foreground;
-    font-family: "Figtree", system-ui, sans-serif;
-    -webkit-font-smoothing: antialiased;
+    font-family: "Inter", system-ui, sans-serif;
+    overscroll-behavior: none;
+  }
+
+  /* Scrollbar styling */
+  ::-webkit-scrollbar {
+    width: 4px;
+  }
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 4px;
   }
 }
 
 @layer utilities {
-  .bg-sent-bubble {
-    background-color: oklch(var(--sent-bubble));
+  .fc-green {
+    color: var(--fc-green);
   }
-  .bg-received-bubble {
-    background-color: oklch(var(--received-bubble));
+  .bg-fc-green {
+    background-color: var(--fc-green);
   }
-  .text-online {
-    color: oklch(var(--online-green));
+  .bg-fc-green-dark {
+    background-color: var(--fc-green-dark);
   }
-  .bg-online {
-    background-color: oklch(var(--online-green));
+  .bg-fc-green-light {
+    background-color: var(--fc-green-light);
   }
-  .text-tick-blue {
-    color: oklch(var(--tick-blue));
+  .bg-fc-sent {
+    background-color: var(--fc-sent-bubble);
   }
-  .glow-primary {
-    box-shadow: 0 0 20px var(--brand-glow);
+  .bg-fc-chat {
+    background-color: var(--fc-chat-bg);
   }
-  .scrollbar-hide {
-    -ms-overflow-style: none;
-    scrollbar-width: none;
+  .bg-fc-header {
+    background-color: var(--fc-header-bg);
   }
-  .scrollbar-hide::-webkit-scrollbar {
-    display: none;
+  .border-fc-green {
+    border-color: var(--fc-green);
   }
-}
 
-@keyframes typing-dot {
-  0%,
-  60%,
-  100% {
-    transform: translateY(0);
-    opacity: 0.4;
+  /* WhatsApp-style chat background pattern */
+  .chat-bg {
+    background-color: #e5ddd5;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100'%3E%3Cpath d='M10 10h2v2h-2zm20 0h2v2h-2zm20 0h2v2h-2zm20 0h2v2h-2zm20 0h2v2h-2zM0 30h2v2H0zm20 0h2v2h-2zm20 0h2v2h-2zm20 0h2v2h-2zm20 0h2v2h-2zm20 0h2v2h-2zM10 50h2v2h-2zm20 0h2v2h-2zm20 0h2v2h-2zm20 0h2v2h-2zm20 0h2v2h-2zM0 70h2v2H0zm20 0h2v2h-2zm20 0h2v2h-2zm20 0h2v2h-2zm20 0h2v2h-2zm20 0h2v2h-2zM10 90h2v2h-2zm20 0h2v2h-2zm20 0h2v2h-2zm20 0h2v2h-2zm20 0h2v2h-2z' fill='%23c5b9b1' fill-opacity='0.3'/%3E%3C/svg%3E");
   }
-  30% {
-    transform: translateY(-4px);
-    opacity: 1;
-  }
-}
 
-.typing-dot {
-  animation: typing-dot 1.4s infinite ease-in-out;
-}
-.typing-dot:nth-child(2) {
-  animation-delay: 0.2s;
-}
-.typing-dot:nth-child(3) {
-  animation-delay: 0.4s;
+  .animate-typing span {
+    display: inline-block;
+    animation: typing-dot 1.4s infinite ease-in-out;
+  }
+  .animate-typing span:nth-child(2) {
+    animation-delay: 0.2s;
+  }
+  .animate-typing span:nth-child(3) {
+    animation-delay: 0.4s;
+  }
+
+  @keyframes typing-dot {
+    0%,
+    60%,
+    100% {
+      transform: translateY(0);
+      opacity: 0.4;
+    }
+    30% {
+      transform: translateY(-4px);
+      opacity: 1;
+    }
+  }
+
+  .slide-in-right {
+    animation: slideInRight 0.25s ease-out;
+  }
+  @keyframes slideInRight {
+    from {
+      transform: translateX(100%);
+      opacity: 0;
+    }
+    to {
+      transform: translateX(0);
+      opacity: 1;
+    }
+  }
+
+  .fade-in {
+    animation: fadeIn 0.3s ease-out;
+  }
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+      transform: translateY(8px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
 }
