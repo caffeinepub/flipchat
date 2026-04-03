@@ -61,7 +61,7 @@ function avatarColor(id: string) {
 }
 
 const LOGO_SRC =
-  "/assets/uploads/file_0000000002bc71fa916666f6929ea802-019d3ae7-437e-7238-9d98-d280ebef58c4-1.png";
+  "/assets/inshot_20260402_072715578-019d519a-e3c5-7106-a329-0cab0d9719e7.png";
 
 // ── Status types ──────────────────────────────────────────────────────────────
 interface StatusEntry {

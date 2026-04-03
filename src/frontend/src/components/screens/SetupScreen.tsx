@@ -42,7 +42,7 @@ export function SetupScreen({ onComplete, isSaving }: SetupScreenProps) {
       >
         <div className="w-20 h-20 rounded-2xl overflow-hidden mx-auto">
           <img
-            src="/assets/generated/flipchat-logo-transparent.png"
+            src="/assets/inshot_20260402_072715578-019d519a-e3c5-7106-a329-0cab0d9719e7.png"
             alt="Flipchat"
             className="w-full h-full object-cover"
           />

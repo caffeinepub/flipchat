@@ -450,14 +450,10 @@ function LoginScreen({ onLogin }: { onLogin: (user: User) => void }) {
         {step === "form" ? (
           <>
             <div>
-              <label
-                htmlFor="login-name"
-                className="text-xs text-gray-500 font-medium mb-1 block"
-              >
+              <label className="text-xs text-gray-500 font-medium mb-1 block">
                 Aapka Naam
               </label>
               <input
-                id="login-name"
                 data-ocid="login.input"
                 type="text"
                 value={name}
@@ -467,14 +463,10 @@ function LoginScreen({ onLogin }: { onLogin: (user: User) => void }) {
               />
             </div>
             <div>
-              <label
-                htmlFor="login-phone"
-                className="text-xs text-gray-500 font-medium mb-1 block"
-              >
+              <label className="text-xs text-gray-500 font-medium mb-1 block">
                 Phone Number (10 digits)
               </label>
               <input
-                id="login-phone"
                 data-ocid="login.search_input"
                 type="tel"
                 value={phone}
@@ -487,7 +479,6 @@ function LoginScreen({ onLogin }: { onLogin: (user: User) => void }) {
             </div>
             {error && <p className="text-red-500 text-sm">{error}</p>}
             <button
-              type="button"
               data-ocid="login.primary_button"
               onClick={handleSendOTP}
               disabled={loading}
@@ -503,14 +494,10 @@ function LoginScreen({ onLogin }: { onLogin: (user: User) => void }) {
               OTP bheja gaya <strong>+91 {phone}</strong> par
             </p>
             <div>
-              <label
-                htmlFor="login-otp"
-                className="text-xs text-gray-500 font-medium mb-1 block"
-              >
+              <label className="text-xs text-gray-500 font-medium mb-1 block">
                 OTP Code
               </label>
               <input
-                id="login-otp"
                 data-ocid="login.textarea"
                 type="tel"
                 value={otp}
@@ -524,7 +511,6 @@ function LoginScreen({ onLogin }: { onLogin: (user: User) => void }) {
             </div>
             {error && <p className="text-red-500 text-sm">{error}</p>}
             <button
-              type="button"
               data-ocid="login.submit_button"
               onClick={handleVerify}
               disabled={loading}
@@ -534,7 +520,6 @@ function LoginScreen({ onLogin }: { onLogin: (user: User) => void }) {
               {loading ? "Verify ho raha hai..." : "Verify Karo"}
             </button>
             <button
-              type="button"
               onClick={() => {
                 setStep("form");
                 setError("");
@@ -581,12 +566,10 @@ function ChatListScreen({
         {showSearch ? (
           <div className="flex items-center gap-2">
             <button
-              type="button"
               onClick={() => setShowSearch(false)}
               className="text-white p-1"
             >
               <svg
-                aria-hidden="true"
                 xmlns="http://www.w3.org/2000/svg"
                 width="20"
                 height="20"
@@ -599,6 +582,7 @@ function ChatListScreen({
               </svg>
             </button>
             <input
+              autoFocus
               type="text"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
@@ -611,12 +595,10 @@ function ChatListScreen({
             <h1 className="text-white text-xl font-bold">Flipchat</h1>
             <div className="flex gap-3">
               <button
-                type="button"
                 onClick={() => setShowSearch(true)}
                 className="text-white/90"
               >
                 <svg
-                  aria-hidden="true"
                   xmlns="http://www.w3.org/2000/svg"
                   width="20"
                   height="20"
@@ -629,9 +611,8 @@ function ChatListScreen({
                   <path d="m21 21-4.35-4.35" />
                 </svg>
               </button>
-              <button type="button" className="text-white/90">
+              <button className="text-white/90">
                 <svg
-                  aria-hidden="true"
                   xmlns="http://www.w3.org/2000/svg"
                   width="20"
                   height="20"
@@ -667,7 +648,6 @@ function ChatListScreen({
             ).length;
             return (
               <button
-                type="button"
                 key={chat.id}
                 data-ocid={`chats.item.${i + 1}`}
                 onClick={() => onOpenChat(chat)}
@@ -681,7 +661,6 @@ function ChatListScreen({
                       className="absolute -bottom-0.5 -right-0.5 w-4 h-4 rounded-full flex items-center justify-center"
                     >
                       <svg
-                        aria-hidden="true"
                         xmlns="http://www.w3.org/2000/svg"
                         width="10"
                         height="10"
@@ -730,14 +709,12 @@ function ChatListScreen({
 
       {/* FAB */}
       <button
-        type="button"
         data-ocid="chats.open_modal_button"
         onClick={onNewChat}
         style={{ background: "#25D366" }}
         className="absolute bottom-20 right-4 w-14 h-14 rounded-full flex items-center justify-center shadow-lg active:scale-95 transition-transform"
       >
         <svg
-          aria-hidden="true"
           xmlns="http://www.w3.org/2000/svg"
           width="24"
           height="24"
@@ -773,13 +750,11 @@ function ChatWindow({
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const fileRef = useRef<HTMLInputElement>(null);
 
-  // biome-ignore lint/correctness/useExhaustiveDependencies: scroll on message change
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [chat.messages]);
 
   // Mark as read
-  // biome-ignore lint/correctness/useExhaustiveDependencies: intentionally only re-run on chat id change
   useEffect(() => {
     const updated = {
       ...chat,
@@ -859,13 +834,11 @@ function ChatWindow({
         className="px-3 pt-10 pb-2 flex items-center gap-3"
       >
         <button
-          type="button"
           data-ocid="chat.secondary_button"
           onClick={onBack}
           className="text-white p-1"
         >
           <svg
-            aria-hidden="true"
             xmlns="http://www.w3.org/2000/svg"
             width="22"
             height="22"
@@ -897,9 +870,8 @@ function ChatWindow({
           </p>
         </div>
         <div className="flex gap-4 text-white/90">
-          <button type="button" data-ocid="chat.toggle">
+          <button data-ocid="chat.toggle">
             <svg
-              aria-hidden="true"
               xmlns="http://www.w3.org/2000/svg"
               width="20"
               height="20"
@@ -912,9 +884,8 @@ function ChatWindow({
               <rect x="1" y="5" width="15" height="14" rx="2" ry="2" />
             </svg>
           </button>
-          <button type="button" data-ocid="chat.link">
+          <button data-ocid="chat.link">
             <svg
-              aria-hidden="true"
               xmlns="http://www.w3.org/2000/svg"
               width="20"
               height="20"
@@ -926,9 +897,8 @@ function ChatWindow({
               <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.67 9.5a19.79 19.79 0 0 1-3-8.59A2 2 0 0 1 3.66 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 5.61 5.61l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z" />
             </svg>
           </button>
-          <button type="button" data-ocid="chat.dropdown_menu">
+          <button data-ocid="chat.dropdown_menu">
             <svg
-              aria-hidden="true"
               xmlns="http://www.w3.org/2000/svg"
               width="20"
               height="20"
@@ -1005,9 +975,8 @@ function ChatWindow({
 
       {/* Input bar */}
       <div className="bg-white px-2 py-2 flex items-center gap-2 border-t">
-        <button type="button" className="text-gray-500 p-1">
+        <button className="text-gray-500 p-1">
           <svg
-            aria-hidden="true"
             xmlns="http://www.w3.org/2000/svg"
             width="24"
             height="24"
@@ -1039,13 +1008,11 @@ function ChatWindow({
           onChange={handleImage}
         />
         <button
-          type="button"
           data-ocid="chat.upload_button"
           onClick={() => fileRef.current?.click()}
           className="text-gray-500 p-1"
         >
           <svg
-            aria-hidden="true"
             xmlns="http://www.w3.org/2000/svg"
             width="22"
             height="22"
@@ -1058,14 +1025,12 @@ function ChatWindow({
           </svg>
         </button>
         <button
-          type="button"
           data-ocid="chat.primary_button"
           onClick={handleSend}
           style={{ background: text.trim() ? "#25D366" : "#aaa" }}
           className="w-10 h-10 rounded-full flex items-center justify-center transition-colors active:scale-90"
         >
           <svg
-            aria-hidden="true"
             xmlns="http://www.w3.org/2000/svg"
             width="18"
             height="18"
@@ -1109,18 +1074,11 @@ function NewChatModal({
 
   return (
     <div className="fixed inset-0 z-50 flex items-end" data-ocid="chats.modal">
-      <div
-        className="absolute inset-0 bg-black/40"
-        onClick={onClose}
-        onKeyDown={(e) => e.key === "Enter" && onClose()}
-        role="button"
-        tabIndex={0}
-      />
+      <div className="absolute inset-0 bg-black/40" onClick={onClose} />
       <div className="relative w-full bg-white rounded-t-2xl p-6 flex flex-col gap-4">
         <h2 className="font-bold text-lg">Naya Chat</h2>
         <div className="flex gap-2">
           <button
-            type="button"
             data-ocid="chats.tab"
             onClick={() => setType("contact")}
             style={{ background: type === "contact" ? "#25D366" : "#f0f0f0" }}
@@ -1129,7 +1087,6 @@ function NewChatModal({
             Contact
           </button>
           <button
-            type="button"
             onClick={() => setType("group")}
             style={{ background: type === "group" ? "#25D366" : "#f0f0f0" }}
             className={`flex-1 py-2 rounded-full text-sm font-semibold transition-colors ${type === "group" ? "text-white" : "text-gray-700"}`}
@@ -1155,7 +1112,6 @@ function NewChatModal({
           />
         )}
         <button
-          type="button"
           data-ocid="chats.submit_button"
           onClick={handleCreate}
           style={{ background: "#25D366" }}
@@ -1164,7 +1120,6 @@ function NewChatModal({
           Banao
         </button>
         <button
-          type="button"
           data-ocid="chats.cancel_button"
           onClick={onClose}
           className="text-center text-gray-400 text-sm"
@@ -1250,7 +1205,6 @@ function CallsScreen() {
         </div>
         <div className="flex gap-8 items-center">
           <button
-            type="button"
             data-ocid="calls.toggle"
             onClick={() =>
               setActiveCall((p) => (p ? { ...p, muted: !p.muted } : null))
@@ -1261,7 +1215,6 @@ function CallsScreen() {
             }}
           >
             <svg
-              aria-hidden="true"
               xmlns="http://www.w3.org/2000/svg"
               width="24"
               height="24"
@@ -1277,14 +1230,12 @@ function CallsScreen() {
             </svg>
           </button>
           <button
-            type="button"
             data-ocid="calls.delete_button"
             onClick={endCall}
             className="w-16 h-16 rounded-full flex items-center justify-center"
             style={{ background: "#FF3B30" }}
           >
             <svg
-              aria-hidden="true"
               xmlns="http://www.w3.org/2000/svg"
               width="28"
               height="28"
@@ -1298,7 +1249,6 @@ function CallsScreen() {
             </svg>
           </button>
           <button
-            type="button"
             onClick={() =>
               setActiveCall((p) => (p ? { ...p, speaker: !p.speaker } : null))
             }
@@ -1310,7 +1260,6 @@ function CallsScreen() {
             }}
           >
             <svg
-              aria-hidden="true"
               xmlns="http://www.w3.org/2000/svg"
               width="24"
               height="24"
@@ -1337,7 +1286,6 @@ function CallsScreen() {
       <div className="flex-1 overflow-y-auto bg-white" data-ocid="calls.list">
         {DEMO_CALLS.map((call, i) => (
           <button
-            type="button"
             key={call.id}
             data-ocid={`calls.item.${i + 1}`}
             onClick={() => startCall(call.name)}
@@ -1360,9 +1308,8 @@ function CallsScreen() {
                 {call.duration && <span>• {call.duration}</span>}
               </p>
             </div>
-            <button type="button" style={{ color: "#25D366" }}>
+            <button style={{ color: "#25D366" }}>
               <svg
-                aria-hidden="true"
                 xmlns="http://www.w3.org/2000/svg"
                 width="20"
                 height="20"
@@ -1441,14 +1388,12 @@ function StatusScreen({ user }: { user: User }) {
                 <Avatar2 name={user.name} image={user.avatar} size={48} />
               </div>
               <button
-                type="button"
                 data-ocid="status.open_modal_button"
                 onClick={() => setShowAdd(true)}
                 style={{ background: "#25D366" }}
                 className="absolute -bottom-0.5 -right-0.5 w-5 h-5 rounded-full flex items-center justify-center"
               >
                 <svg
-                  aria-hidden="true"
                   xmlns="http://www.w3.org/2000/svg"
                   width="12"
                   height="12"
@@ -1479,7 +1424,6 @@ function StatusScreen({ user }: { user: User }) {
           </p>
           {DEMO_STATUSES.map((s, i) => (
             <button
-              type="button"
               key={s.id}
               data-ocid={`status.item.${i + 1}`}
               onClick={() => setViewStatus(s)}
@@ -1510,9 +1454,6 @@ function StatusScreen({ user }: { user: User }) {
           <div
             className="absolute inset-0 bg-black/50"
             onClick={() => setShowAdd(false)}
-            onKeyDown={(e) => e.key === "Enter" && setShowAdd(false)}
-            role="button"
-            tabIndex={0}
           />
           <div className="relative w-full bg-white rounded-t-2xl p-6 flex flex-col gap-4">
             <h2 className="font-bold text-lg">Apna Status Likhein</h2>
@@ -1541,7 +1482,6 @@ function StatusScreen({ user }: { user: User }) {
             <div className="flex gap-2 flex-wrap">
               {bgOptions.map((c) => (
                 <button
-                  type="button"
                   key={c}
                   onClick={() => setNewBg(c)}
                   style={{
@@ -1555,7 +1495,6 @@ function StatusScreen({ user }: { user: User }) {
               ))}
             </div>
             <button
-              type="button"
               data-ocid="status.submit_button"
               onClick={postStatus}
               style={{ background: "#25D366" }}
@@ -1564,7 +1503,6 @@ function StatusScreen({ user }: { user: User }) {
               Post Karo
             </button>
             <button
-              type="button"
               data-ocid="status.cancel_button"
               onClick={() => setShowAdd(false)}
               className="text-gray-400 text-sm text-center"
@@ -1581,7 +1519,6 @@ function StatusScreen({ user }: { user: User }) {
           className="fixed inset-0 z-50 flex flex-col"
           style={{ background: viewStatus.bg }}
           onClick={() => setViewStatus(null)}
-          onKeyDown={(e) => e.key === "Enter" && setViewStatus(null)}
           data-ocid="status.dialog"
         >
           <div className="pt-12 px-4 flex items-center gap-3">
@@ -1597,12 +1534,10 @@ function StatusScreen({ user }: { user: User }) {
             </p>
           </div>
           <button
-            type="button"
             data-ocid="status.close_button"
             className="absolute top-4 right-4 text-white"
           >
             <svg
-              aria-hidden="true"
               xmlns="http://www.w3.org/2000/svg"
               width="24"
               height="24"
@@ -1668,14 +1603,12 @@ function ProfileScreen({
         <div className="relative">
           <Avatar2 name={user.name} image={user.avatar} size={80} />
           <button
-            type="button"
             data-ocid="profile.edit_button"
             onClick={() => fileRef.current?.click()}
             style={{ background: "#25D366" }}
             className="absolute -bottom-1 -right-1 w-7 h-7 rounded-full flex items-center justify-center shadow"
           >
             <svg
-              aria-hidden="true"
               xmlns="http://www.w3.org/2000/svg"
               width="14"
               height="14"
@@ -1709,7 +1642,6 @@ function ProfileScreen({
         {/* Name */}
         <div className="flex items-center px-4 py-4 gap-3">
           <svg
-            aria-hidden="true"
             xmlns="http://www.w3.org/2000/svg"
             width="20"
             height="20"
@@ -1727,12 +1659,12 @@ function ProfileScreen({
               <div className="flex gap-2 items-center mt-0.5">
                 <input
                   data-ocid="profile.input"
+                  autoFocus
                   value={nameVal}
                   onChange={(e) => setNameVal(e.target.value)}
                   className="flex-1 border-b border-green-500 outline-none text-sm py-0.5"
                 />
                 <button
-                  type="button"
                   data-ocid="profile.save_button"
                   onClick={saveName}
                   style={{ color: "#25D366" }}
@@ -1747,13 +1679,11 @@ function ProfileScreen({
           </div>
           {!editName && (
             <button
-              type="button"
               data-ocid="profile.secondary_button"
               onClick={() => setEditName(true)}
               style={{ color: "#25D366" }}
             >
               <svg
-                aria-hidden="true"
                 xmlns="http://www.w3.org/2000/svg"
                 width="16"
                 height="16"
@@ -1771,13 +1701,11 @@ function ProfileScreen({
 
         {/* About */}
         <button
-          type="button"
           data-ocid="profile.panel"
           onClick={() => setShowAbout(true)}
           className="flex items-center px-4 py-4 gap-3 w-full text-left"
         >
           <svg
-            aria-hidden="true"
             xmlns="http://www.w3.org/2000/svg"
             width="20"
             height="20"
@@ -1800,7 +1728,6 @@ function ProfileScreen({
             </p>
           </div>
           <svg
-            aria-hidden="true"
             xmlns="http://www.w3.org/2000/svg"
             width="16"
             height="16"
@@ -1816,7 +1743,6 @@ function ProfileScreen({
         {/* Phone */}
         <div className="flex items-center px-4 py-4 gap-3">
           <svg
-            aria-hidden="true"
             xmlns="http://www.w3.org/2000/svg"
             width="20"
             height="20"
@@ -1836,7 +1762,6 @@ function ProfileScreen({
         {/* Member since */}
         <div className="flex items-center px-4 py-4 gap-3">
           <svg
-            aria-hidden="true"
             xmlns="http://www.w3.org/2000/svg"
             width="20"
             height="20"
@@ -1866,9 +1791,6 @@ function ProfileScreen({
           <div
             className="absolute inset-0 bg-black/40"
             onClick={() => setShowAbout(false)}
-            onKeyDown={(e) => e.key === "Enter" && setShowAbout(false)}
-            role="button"
-            tabIndex={0}
           />
           <div className="relative w-full bg-white rounded-t-2xl p-6 flex flex-col gap-4">
             <h2 className="font-bold text-lg">About</h2>
@@ -1881,7 +1803,6 @@ function ProfileScreen({
               maxLength={100}
             />
             <button
-              type="button"
               data-ocid="profile.submit_button"
               onClick={saveAbout}
               style={{ background: "#25D366" }}
@@ -1890,7 +1811,6 @@ function ProfileScreen({
               Save
             </button>
             <button
-              type="button"
               data-ocid="profile.cancel_button"
               onClick={() => setShowAbout(false)}
               className="text-gray-400 text-sm text-center"
@@ -1944,7 +1864,6 @@ function MainApp({
       label: "Chats",
       icon: (
         <svg
-          aria-hidden="true"
           xmlns="http://www.w3.org/2000/svg"
           width="22"
           height="22"
@@ -1962,7 +1881,6 @@ function MainApp({
       label: "Calls",
       icon: (
         <svg
-          aria-hidden="true"
           xmlns="http://www.w3.org/2000/svg"
           width="22"
           height="22"
@@ -1980,7 +1898,6 @@ function MainApp({
       label: "Status",
       icon: (
         <svg
-          aria-hidden="true"
           xmlns="http://www.w3.org/2000/svg"
           width="22"
           height="22"
@@ -1999,7 +1916,6 @@ function MainApp({
       label: "Profile",
       icon: (
         <svg
-          aria-hidden="true"
           xmlns="http://www.w3.org/2000/svg"
           width="22"
           height="22"
@@ -2052,7 +1968,6 @@ function MainApp({
         >
           {tabs.map((t) => (
             <button
-              type="button"
               key={t.key}
               data-ocid={`nav.${t.key}.link`}
               onClick={() => handleTabChange(t.key)}
